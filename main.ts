@@ -15,6 +15,13 @@ cpSync(join(here, 'game'), join(out, 'game'), { recursive: true });
 mkdirSync(join(out, 'screenshots'), { recursive: true });
 if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
 
+// Stamp a build manifest so the shipped bundle is traceable.
+writeFileSync(join(out, 'build.json'), JSON.stringify({
+  builtAt: new Date().toISOString(),
+  entry: 'game/index.html',
+  assets: ['game', 'screenshots']
+}, null, 2));
+
 writeFileSync(
   join(out, 'dossier.json'),
   buildDossier(out, {
