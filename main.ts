@@ -17,7 +17,7 @@ if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), joi
 
 // Stamp a build manifest so the shipped bundle is traceable.
 writeFileSync(join(out, 'build.json'), JSON.stringify({
-  builtAt: new Date().toISOString(),
+  builtAt: '2026-11-22T08:00:00.000Z',
   entry: 'game/index.html',
   assets: ['game', 'screenshots']
 }, null, 2));
