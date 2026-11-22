@@ -16,8 +16,9 @@ mkdirSync(join(out, 'screenshots'), { recursive: true });
 if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
 
 // Stamp a build manifest so the shipped bundle is traceable.
+// builtAt is pinned for reproducible builds.
 writeFileSync(join(out, 'build.json'), JSON.stringify({
-  builtAt: '2026-11-22T08:00:00.000Z',
+  builtAt: '2026-11-22T08:30:00.000Z',
   entry: 'game/index.html',
   assets: ['game', 'screenshots']
 }, null, 2));
