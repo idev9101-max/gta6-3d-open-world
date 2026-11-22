@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: mission flow — objectives, fail/complete, mission entities.
 // Mission manager - handles mission flow and progression
 const DRIVE_ARRIVAL_RADIUS = 10;
 const PICKUP_ARRIVAL_DIST = 3;

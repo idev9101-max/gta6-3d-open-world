@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: city simulation — entity spawning, traffic/pedestrians, wanted AI.
 /**
  * World - owns and manages the city simulation: road network, buildings,
  * traffic, parked cars, pedestrians, police, day/night time of day, weather,

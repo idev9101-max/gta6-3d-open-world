@@ -1,4 +1,4 @@
-// SOLMAR NIGHTS - gta6-01 entry program (Node 22, stdlib only).
+// SOLMAR NIGHTS - gta6-01 entry point (Node 22, stdlib only).
 // Copies game/ and screenshots/ to /output and writes /output/dossier.json
 // with the vendored make.fun buildDossier library.
 

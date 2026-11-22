@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: lighting system — street lamps, headlights, night toggles.
 /**
  * LightingSystem - dynamic lighting for the city: street lamps at intersections
  * and along roads, vehicle headlights, and building-window illumination toggled

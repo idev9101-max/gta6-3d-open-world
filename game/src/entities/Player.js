@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: player character — on-foot movement, vehicles, combat, wanted level.
 // Player character - on foot and in vehicle
 const MAX_WALK_SPEED = 4;
 const MAX_RUN_SPEED = 8;

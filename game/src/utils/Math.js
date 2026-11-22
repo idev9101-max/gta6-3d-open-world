@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: math utilities — clamp, lerp, geometry helpers for game code.
 // Math utilities - common math helpers used throughout the game
 const TWO_PI = Math.PI * 2;
 const HALF_PI = Math.PI / 2;

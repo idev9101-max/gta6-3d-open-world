@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: ocean with waves, shore break and foam particles.
 // Ocean system with waves
 const OCEAN_SIZE_MULT = 3;
 const OCEAN_SEGMENTS = 120;

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: building generator — varied architecture, landmarks, palms.
 // Building generation with varied architecture
 const BUILDING_COLORS_OLD = [
     0x888888, 0x777777, 0x999999, 0xaaaaaa, 0x666666,

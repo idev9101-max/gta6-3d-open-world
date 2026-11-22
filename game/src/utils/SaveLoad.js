@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: save/load — localStorage persistence of player, world, missions.
 // Save/Load system using localStorage - handles game state persistence
 const SAVE_KEY = 'solmar_nights_save';
 const SETTINGS_KEY = 'solmar_nights_settings';

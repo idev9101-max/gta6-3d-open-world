@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: weapon definitions and hit-scan combat system.
 // Weapon definitions and combat system
 const Weapons = {
     pistol: {

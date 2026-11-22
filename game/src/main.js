@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: game bootstrap — URL params (probe/autotest/scene), DOM-ready Game start.
 // Main entry point - bootstrap the game
 // Initializes global error handling and starts the Game instance
 (function() {

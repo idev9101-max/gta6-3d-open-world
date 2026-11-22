@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: police car — pursuit, ramming, siren lights.
 // Police car - chases player
 const POLICE_CAR_MAX_SPEED = 45;
 const POLICE_CAR_ACCELERATION = 35;

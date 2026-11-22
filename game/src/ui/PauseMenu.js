@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: pause menu — resume, save, load, quit.
 // Pause menu UI - handles pause screen and save/load/quit actions
 const NOTIFICATION_LIFETIME = 2000;
 

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: visual effects — muzzle flashes, tracers, explosions, blood.
 // Visual effects system
 const MAX_PARTICLES = 500;
 const MAX_DECALS = 100;

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: procedural road grid — meshes, waypoints, intersections.
 // Road system - procedural grid with mesh generation
 const BUILDING_CHANCE = 0.7;
 const ROAD_Y = 0.05;

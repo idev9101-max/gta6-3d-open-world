@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: police ped — patrol, chase, shoot at the player.
 // Police entities - PoliceCar and PolicePed
 const POLICE_PED_HEALTH = 150;
 const POLICE_PED_SPEED = 3;

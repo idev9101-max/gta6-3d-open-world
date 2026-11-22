@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: six story missions with objectives and marker beacons.
 // Mission definitions and marker system
 const Missions = [
     {

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: mission UI — start/complete/failed/busted screens.
 // Mission UI screens - mission start, complete, failed, busted, game over
 const ELEMENT_IDS = {
     MISSION_COMPLETE_SCREEN: 'mission-complete-screen',

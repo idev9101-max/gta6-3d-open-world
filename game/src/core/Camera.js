@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: third-person chase camera with smoothing, collision and shake.
 // Third-person chase camera system
 const MIN_CHASE_DISTANCE = 2;
 const MAX_CHASE_DISTANCE = 30;

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: keyboard, mouse and gamepad input with simulated keys for autotest.
 // Input handling system
 const GAME_KEY_CODES = new Set([
     'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 

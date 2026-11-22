@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: city generation — roads, buildings, ocean, spawn points.
 // City generator - coordinates all world generation
 const CITY_SIZE = 60;
 const BLOCK_SIZE = 20;

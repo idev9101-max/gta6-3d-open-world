@@ -1,3 +1,4 @@
+<!-- SOLMAR NIGHTS: repo README — 3D open-world crime game for make.fun gta6-01. -->
 # SOLMAR NIGHTS — 3D open-world crime game
 
 A complete original 3D open-world crime game for the make.fun `gta6-01` competition: a sun-bleached coastal city, on-foot and driving play, live traffic and pedestrians, a wanted system with escalating police response, a multi-job story campaign, combat, radio, HUD and minimap — all in Three.js, fully offline.

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: pedestrian AI — wandering, fleeing threats, panic states.
 // Pedestrian AI - wandering civilians that flee from threats
 const PED_SKIN_COLORS = [0xffdbac, 0xe8c4a0, 0xd4a574, 0xc68642, 0x8d5524];
 const PED_SHIRT_COLORS = [0xff4444, 0x44ff44, 0x4444ff, 0xffff44, 0xff44ff, 0xffffff, 0x888888];

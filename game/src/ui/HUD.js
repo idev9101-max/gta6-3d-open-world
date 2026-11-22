@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: HUD — health/armor bars, wanted stars, money, ammo, mission text.
 /**
  * HUD - on-screen display: health and armor bars, wanted stars, money, ammo,
  * mission objective text and the minimap. Reflects player state each frame and

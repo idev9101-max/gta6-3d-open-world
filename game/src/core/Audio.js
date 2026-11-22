@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: Web Audio synth engine — engine, gunshots, sirens, footsteps.
 // Web Audio API synth-based sound system
 const ENGINE_BASE_FREQ = 60;
 const ENGINE_MAX_FREQ_MULT = 120;

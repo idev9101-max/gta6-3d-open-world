@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: traffic car — waypoint following, obstacle avoidance.
 // Traffic car - AI driven on waypoints
 const WAYPOINT_THRESHOLD = 8;
 const STUCK_THRESHOLD = 0.1;

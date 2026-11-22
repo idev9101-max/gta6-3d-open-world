@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: game orchestrator — probe-aware init, entity systems, day/night cycle, save/load.
 // Main Game class - orchestrates all systems
 const MAX_AUTO_TEST_STEPS = 8;
 // Probe (?probe=N) renders this many frames, then stops for capture

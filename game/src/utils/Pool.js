@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: object pools — reusable pools for performance-critical objects.
 // Object Pool and PoolManager for performance-critical object reuse
 const DEFAULT_INITIAL_SIZE = 0;
 

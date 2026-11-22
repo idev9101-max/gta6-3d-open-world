@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: sky system — day/night cycle, sun, moon, stars, clouds.
 // Sky system with day/night cycle - procedural sky dome, sun, moon, stars, clouds
 const SKY_RADIUS = 500;
 const SKY_SEGMENTS = 32;

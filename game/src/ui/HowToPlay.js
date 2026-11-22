@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: how-to-play screen — control scheme reference.
 // How to play screen - displays control scheme and gameplay info
 const BACK_BUTTON_ID = 'btn-howto-back';
 

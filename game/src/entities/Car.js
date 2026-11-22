@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: base car — arcade physics, lights, damage, engine sound.
 // Base car class with arcade physics
 const CAR_BODY_COLORS = [
     0xff3333, 0x33ff33, 0x3333ff, 0xffff33, 0xff33ff, 0x33ffff,

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: title screen — new game, continue, how to play.
 // Title screen UI - main menu with new game, continue, and how to play
 const BUTTON_IDS = {
     NEW_GAME: 'btn-new-game',

@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: instanced building rendering — bodies, windows, roofs.
 // Building instancing system for performance - creates instanced meshes for buildings
 const BUILDING_COLORS_INST = [
     0x888888, 0x777777, 0x999999, 0xaaaaaa, 0x666666,

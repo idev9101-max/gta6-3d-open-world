@@ -1,3 +1,4 @@
+// SOLMAR NIGHTS: minimap radar — roads, entity blips, mission markers.
 // Minimap radar system - draws top-down view of world with entity blips
 const MINIMAP_CANVAS_ID = 'minimap-canvas';
 const DEFAULT_SIZE = 180;
