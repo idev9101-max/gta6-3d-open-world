@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLMAR NIGHTS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        #game-canvas { display: block; width: 100vw; height: 100vh; }
+        #ui-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); color: #fff; z-index: 100; pointer-events: auto; }
+        .screen.hidden { display: none; }
+        .screen h1 { font-size: 4rem; margin-bottom: 1rem; text-shadow: 0 0 20px #ff6600, 0 0 40px #ff3300; letter-spacing: 0.2em; }
+        .screen h2 { font-size: 2rem; margin-bottom: 2rem; color: #ffaa00; }
+        .menu-btn { background: linear-gradient(180deg, #333, #111); border: 2px solid #ff6600; color: #ffaa00; padding: 1rem 3rem; font-size: 1.5rem; margin: 0.5rem; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.1em; }
+        .menu-btn:hover { background: linear-gradient(180deg, #ff6600, #cc4400); color: #000; border-color: #ffaa00; box-shadow: 0 0 20px #ff6600; }
+        .menu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .input-group { margin: 1rem 0; text-align: left; min-width: 300px; }
+        .input-group label { display: block; margin-bottom: 0.5rem; color: #aaa; }
+        .input-group input { width: 100%; padding: 0.5rem; background: #111; border: 1px solid #333; color: #fff; font-family: inherit; font-size: 1rem; }
+        .hud { position: fixed; pointer-events: none; z-index: 20; }
+        .hud-top-left { top: 20px; left: 20px; }
+        .hud-top-right { top: 20px; right: 20px; text-align: right; }
+        .hud-bottom-left { bottom: 20px; left: 20px; }
+        .hud-bottom-right { bottom: 20px; right: 20px; text-align: right; }
+        .stat-bar { width: 200px; height: 16px; background: #000; border: 2px solid #333; margin: 4px 0; position: relative; }
+        .stat-bar.fill { height: 100%; transition: width 0.3s; }
+        .stat-bar.health .fill { background: linear-gradient(90deg, #cc0000, #ff4444); }
+        .stat-bar.armor .fill { background: linear-gradient(90deg, #0066cc, #44aaff); }
+        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; }
+        .wanted-stars { display: flex; gap: 2px; justify-content: flex-end; }
+        .star { width: 24px; height: 24px; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>') center/contain no-repeat; }
+        .star.active { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffcc00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'); filter: drop-shadow(0 0 4px #ffcc00); }
+        .minimap { width: 180px; height: 180px; border: 2px solid #ff6600; background: #001100; border-radius: 4px; overflow: hidden; position: relative; }
+        .minimap canvas { width: 100%; height: 100%; display: block; }
+        .mission-text { background: rgba(0,0,0,0.8); border: 2px solid #ff6600; padding: 1rem; max-width: 400px; font-size: 1.1rem; line-height: 1.5; color: #ffaa00; text-shadow: 0 0 4px #000; }
+        .money { font-size: 1.5rem; color: #00ff88; text-shadow: 0 0 4px #000; }
+        .ammo { font-size: 1.2rem; color: #ffaa00; text-shadow: 0 0 4px #000; }
+        .damage-number { position: absolute; pointer-events: none; font-weight: bold; font-size: 1.5rem; animation: floatUp 1s ease-out forwards; text-shadow: 0 0 4px #000; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        .notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 2px solid #ff6600; padding: 2rem 3rem; font-size: 1.5rem; color: #ffaa00; z-index: 50; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 20px #ff6600; } 50% { box-shadow: 0 0 40px #ff6600, 0 0 60px #ff3300; } }
+        .howto-content { max-width: 600px; text-align: left; padding: 2rem; }
+        .howto-content h3 { color: #ff6600; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .howto-content ul { margin-left: 1.5rem; line-height: 2; }
+        .howto-content .key { display: inline-block; background: #222; border: 1px solid #444; padding: 0.2rem 0.5rem; margin-right: 0.5rem; min-width: 2rem; text-align: center; color: #ffaa00; }
+        .mission-complete { text-align: center; }
+        .mission-complete h1 { color: #00ff88; text-shadow: 0 0 20px #00ff88; }
+        .mission-complete .payout { font-size: 2rem; color: #ffcc00; margin: 1rem 0; }
+        .busted-screen { text-align: center; }
+        .busted-screen h1 { color: #ff3333; text-shadow: 0 0 20px #ff3333; font-size: 5rem; }
+        .story-screen { max-width: 800px; text-align: left; padding: 2rem; line-height: 1.8; font-size: 1.2rem; }
+        .story-screen .continue-hint { margin-top: 2rem; color: #888; font-size: 1rem; text-align: center; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
+    <canvas id="game-canvas"></canvas>
+    <div id="ui-overlay"></div>
+
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen hidden">
+        <h1>SOLMAR NIGHTS</h1>
+        <h2>Open World Crime Saga</h2>
+        <button id="btn-new-game" class="menu-btn">New Game</button>
+        <button id="btn-continue" class="menu-btn" disabled>Continue</button>
+        <button id="btn-howto" class="menu-btn">How to Play</button>
+    </div>
+
+    <!-- How to Play -->
+    <div id="howto-screen" class="screen hidden">
+        <div class="howto-content">
+            <h2>CONTROLS</h2>
+            <h3>ON FOOT</h3>
+            <ul>
+                <li><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> - Move</li>
+                <li><span class="key">Shift</span> - Run</li>
+                <li><span class="key">Space</span> - Jump</li>
+                <li><span class="key">E</span> - Enter/Exit Vehicle</li>
+                <li><span class="key">LMB</span> - Shoot</li>
+                <li><span class="key">R</span> - Reload</li>
+            </ul>
+            <h3>IN VEHICLE</h3>
+            <ul>
+                <li><span class="key">W</span> - Accelerate</li>
+                <li><span class="key">S</span> - Brake/Reverse</li>
+                <li><span class="key">A</span><span class="key">D</span> - Steer</li>
+                <li><span class="key">Space</span> - Handbrake</li>
+                <li><span class="key">E</span> - Exit Vehicle</li>
+            </ul>
+            <h3>GENERAL</h3>
+            <ul>
+                <li><span class="key">Esc</span> - Pause Menu</li>
+                <li><span class="key">M</span> - Toggle Minimap Size</li>
+            </ul>
+            <h3>GAMEPLAY</h3>
+            <ul>
+                <li>Complete 6 story missions to finish the game</li>
+                <li>Gain wanted stars by committing crimes</li>
+                <li>Escape police by staying out of sight</li>
+                <li>Steal parked cars or hijack moving ones</li>
+                <li>Save/Load from pause menu or title screen</li>
+            </ul>
+            <button id="btn-howto-back" class="menu-btn" style="margin-top: 2rem;">Back</button>
+        </div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pause-screen" class="screen hidden">
+        <h2>PAUSED</h2>
+        <button id="btn-resume" class="menu-btn">Resume</button>
+        <button id="btn-save" class="menu-btn">Save Game</button>
+        <button id="btn-load" class="menu-btn">Load Game</button>
+        <button id="btn-quit" class="menu-btn">Quit to Title</button>
+    </div>
+
+    <!-- Mission Intro/Outro -->
+    <div id="story-screen" class="screen hidden">
+        <div class="story-screen" id="story-content"></div>
+    </div>
+
+    <!-- Mission Complete -->
+    <div id="mission-complete-screen" class="screen hidden mission-complete">
+        <h1>MISSION COMPLETE</h1>
+        <div id="mission-complete-text"></div>
+        <div class="payout" id="mission-payout"></div>
+        <button id="btn-mission-continue" class="menu-btn">Continue</button>
+    </div>
+
+    <!-- Busted -->
+    <div id="busted-screen" class="screen hidden busted-screen">
+        <h1>BUSTED</h1>
+        <p style="color: #ffaa00; margin: 1rem 0; font-size: 1.5rem;">You lost your weapons and cash</p>
+        <button id="btn-busted-continue" class="menu-btn">Respawn</button>
+    </div>
+
+    <!-- Game Over (optional, for completeness) -->
+    <div id="gameover-screen" class="screen hidden busted-screen">
+        <h1>GAME OVER</h1>
+        <button id="btn-gameover-restart" class="menu-btn">Restart</button>
+    </div>
+
+    <!-- HUD Elements -->
+    <div class="hud hud-top-left">
+        <div>
+            <div class="stat-label">Health</div>
+            <div class="stat-bar health" id="health-bar"><div class="fill" id="health-fill" style="width: 100%"></div></div>
+        </div>
+        <div>
+            <div class="stat-label">Armor</div>
+            <div class="stat-bar armor" id="armor-bar"><div class="fill" id="armor-fill" style="width: 0%"></div></div>
+        </div>
+        <div class="wanted-stars" id="wanted-stars">
+            <div class="star" data-star="1"></div>
+            <div class="star" data-star="2"></div>
+            <div class="star" data-star="3"></div>
+            <div class="star" data-star="4"></div>
+            <div class="star" data-star="5"></div>
+        </div>
+    </div>
+
+    <div class="hud hud-top-right">
+        <div class="minimap" id="minimap-container">
+            <canvas id="minimap-canvas" width="180" height="180"></canvas>
+        </div>
+    </div>
+
+    <div class="hud hud-bottom-left">
+        <div class="mission-text" id="mission-text" style="display: none;"></div>
+    </div>
+
+    <div class="hud hud-bottom-right">
+        <div class="money" id="money-display">$0</div>
+        <div class="ammo" id="ammo-display">AMMO: 12/60</div>
+    </div>
+
+    <div id="damage-numbers"></div>
+
+    <!-- Scripts - Load order matters -->
+    <script src="vendor/three.min.js"></script>
+    <script src="src/utils/Math.js"></script>
+    <script src="src/utils/Pool.js"></script>
+    <script src="src/utils/SaveLoad.js"></script>
+    <script src="src/core/Input.js"></script>
+    <script src="src/core/Audio.js"></script>
+    <script src="src/core/Camera.js"></script>
+    <script src="src/core/Game.js"></script>
+    <script src="src/world/Roads.js"></script>
+    <script src="src/world/Buildings.js"></script>
+    <script src="src/world/BuildingInstancer.js"></script>
+    <script src="src/world/Ocean.js"></script>
+    <script src="src/world/CityGenerator.js"></script>
+    <script src="src/world/World.js"></script>
+    <script src="src/entities/Car.js"></script>
+    <script src="src/entities/TrafficCar.js"></script>
+    <script src="src/entities/Pedestrian.js"></script>
+    <script src="src/entities/Police.js"></script>
+    <script src="src/entities/Player.js"></script>
+    <script src="src/combat/Weapons.js"></script>
+    <script src="src/combat/Effects.js"></script>
+    <script src="src/missions/Missions.js"></script>
+    <script src="src/missions/MissionManager.js"></script>
+    <script src="src/rendering/Sky.js"></script>
+    <script src="src/rendering/Lighting.js"></script>
+    <script src="src/rendering/Minimap.js"></script>
+    <script src="src/ui/HUD.js"></script>
+    <script src="src/ui/TitleScreen.js"></script>
+    <script src="src/ui/PauseMenu.js"></script>
+    <script src="src/ui/HowToPlay.js"></script>
+    <script src="src/ui/MissionUI.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
