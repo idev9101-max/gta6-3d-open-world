@@ -254,22 +254,34 @@ Game.prototype._placeNeonBuildings = function (rng, count, cx, cz, spread) {
 };
 
 Game.prototype._probe1 = function (rng) {
-    // Player on foot on a street corner, 3 stars, one PoliceCar approaching,
-    // mission text visible, neon buildings behind.
-    this.setWanted(3);
-    var px = 20, pz = 20;
-    this.player.spawn(px, 1, pz, 0);
+    // Cover shot: player on foot at an intersection, 5-star wanted, police converging from ahead.
+    this.setWanted(5);
+    this.player.spawn(0, 1, 0, 0);
     this.player.setOnFoot(true);
 
-    // Neon buildings behind
-    this._placeNeonBuildings(rng, 14, 20, 60, 26);
+    var cars = [];
+    var c1 = this.world.spawnProbePoliceCar(-11, 1, 30, Math.PI);
+    c1.targetPlayer = this.player; c1.setSpeed(14);
+    var c2 = this.world.spawnProbePoliceCar(4, 1, 44, Math.PI);
+    c2.targetPlayer = this.player; c2.setSpeed(14);
+    var c3 = this.world.spawnProbePoliceCar(-4, 1, 22, Math.PI);
+    c3.targetPlayer = this.player; c3.setSpeed(14);
+    cars.push(c1.position.clone(), c2.position.clone(), c3.position.clone());
 
-    // Street corner roads already in world; place one police car approaching
-    var policeCar = this.world.spawnProbePoliceCar(px + 30, 1, pz - 10, Math.PI / 2);
-    if (policeCar) policeCar.targetPlayer = this.player;
-    policeCar.setSpeed(7);
+    var peds = [[9, 1, 17], [-13, 1, 28], [0, 1, 38], [-7, 1, 44], [14, 1, 32]];
+    for (var i = 0; i < peds.length; i++) {
+        var q = peds[i];
+        this.world.spawnProbePedestrian(q[0], q[1], q[2], 0);
+    }
+
+    this._placeNeonBuildings(rng, 24, 0, 42, 32);
+
+    this._probeFxTargets = cars;
 
     this.cam.inVehicle = false;
+    this.cam.distance = 9;
+    this.cam.height = 4.5;
+    this.cam.verticalAngle = -0.55;
     this.cam.update(0, this.player.mesh.position, this.player.mesh.quaternion, null, this.world.collisionBounds);
     this.camera.position.copy(this.cam.position);
     this.camera.lookAt(this.cam.lookAtTarget);
@@ -278,48 +290,64 @@ Game.prototype._probe1 = function (rng) {
 };
 
 Game.prototype._probe2 = function (rng) {
-    // First-person-ish over-hood driving view down a lit avenue with traffic cars ahead.
+    // Driving view: player in a car down a lit avenue with traffic ahead.
     this.player.spawn(0, 1, 0, 0);
     this.player.setOnFoot(false);
     var car = this.world.spawnProbePlayerCar(0, 1, 0, 0);
     this.player.enterVehicle(car);
     this.car = car;
+    car.setSpeed(7);
 
-    // Lit avenue traffic ahead
-    for (var i = 0; i < 5; i++) {
-        var tz = -40 - i * 18;
-        var tx = rng.range(-5, 5);
-        var tc = this.world.spawnProbeTrafficCar(tx, 1, tz, 0);
-        if (tc) tc.setSpeed(9);
+    var traffic = [];
+    var spots = [[-7, 1, 26, 0], [-1, 1, 40, 0], [6, 1, 28, 0], [-4, 1, 48, 0], [1, 1, 56, 0], [8, 1, 44, 0]];
+    for (var i = 0; i < spots.length; i++) {
+        var s = spots[i];
+        var tc = this.world.spawnProbeTrafficCar(s[0], s[1], s[2], s[3]);
+        if (tc) { tc.setSpeed(7); traffic.push(tc.position.clone()); }
     }
 
-    this._placeNeonBuildings(rng, 10, 40, -60, 30);
-    this._placeNeonBuildings(rng, 10, -40, -60, 30);
+    var police = this.world.spawnProbePoliceCar(10, 1, 22, 0);
+    if (police) police.setSpeed(0);
+
+    this._placeNeonBuildings(rng, 10, -24, 36, 10);
+    this._placeNeonBuildings(rng, 10, 24, 36, 10);
+    this._placeNeonBuildings(rng, 8, 0, 62, 16);
+
+    this._probeFxTargets = traffic;
 
     this.cam.inVehicle = true;
     this.cam.update(0, this.player.mesh.position, this.player.mesh.quaternion, null, this.world.collisionBounds);
-    this.camera.position.copy(this.cam.position);
-    this.camera.lookAt(this.cam.lookAtTarget);
+    var f = car.getForward();
+    var pos = car.position.clone().add(new THREE.Vector3(0, 5, 0)).add(f.clone().multiplyScalar(-9));
+    var look = car.position.clone().add(new THREE.Vector3(0, 1.2, 0)).add(f.clone().multiplyScalar(34));
+    this.camera.position.copy(pos);
+    this.camera.lookAt(look);
 
     this.missionManager.showMissionText('Reach the drop-off', true);
 };
 
 Game.prototype._probe3 = function (rng) {
-    // Plaza corner with visible weapon impact effect and a pedestrian nearby.
+    // Plaza combat: pedestrians at varied distances ahead, impacts and muzzle flash.
     this.player.spawn(0, 1, 0, 0);
     this.player.setOnFoot(true);
+    this.setWanted(2);
 
-    // Spawn pedestrian nearby
-    var ped = this.world.spawnProbePedestrian(8, 1, 4, 0);
+    var peds = [[-8, 1, 15], [4, 1, 26], [-3, 1, 36], [11, 1, 22], [-12, 1, 40], [2, 1, 48]];
+    var targets = [];
+    for (var i = 0; i < peds.length; i++) {
+        var q = peds[i];
+        this.world.spawnProbePedestrian(q[0], q[1], q[2], 0);
+        targets.push(new THREE.Vector3(q[0], q[1], q[2]));
+    }
 
-    // Fire a weapon impact effect at the pedestrian's feet-ish
-    var fxPos = ped ? ped.mesh.position.clone() : new THREE.Vector3(8, 1, 4);
-    this.effects.spawnImpact(fxPos.x, fxPos.y + 0.3, fxPos.z, 0xffffff, 0);
+    this._placeNeonBuildings(rng, 16, 0, 48, 18);
 
-    // Neon plaza buildings
-    this._placeNeonBuildings(rng, 12, 0, 30, 24);
+    this._probeFxTargets = targets;
 
     this.cam.inVehicle = false;
+    this.cam.distance = 7.5;
+    this.cam.height = 4;
+    this.cam.verticalAngle = -0.4;
     this.cam.update(0, this.player.mesh.position, this.player.mesh.quaternion, null, this.world.collisionBounds);
     this.camera.position.copy(this.cam.position);
     this.camera.lookAt(this.cam.lookAtTarget);
@@ -328,24 +356,69 @@ Game.prototype._probe3 = function (rng) {
 };
 
 Game.prototype._probe4 = function (rng) {
-    // Storefront canyon with parked cars and mission text.
+    // Street canyon vista: parked curb cars, traffic, pedestrians, dense tall buildings.
     this.player.spawn(0, 1, 0, 0);
     this.player.setOnFoot(true);
+    this.setWanted(1);
 
-    // Parked cars along a canyon
-    for (var i = 0; i < 4; i++) {
-        var px = -16 + i * 11;
-        var pc = this.world.spawnProbeParkedCar(px, 1, 22, 0);
+    var parked = [[-18, 1, 30, 0], [-10, 1, 38, 0], [18, 1, 28, 0], [10, 1, 42, 0]];
+    var targets = [];
+    for (var i = 0; i < parked.length; i++) {
+        var q = parked[i];
+        this.world.spawnProbeParkedCar(q[0], q[1], q[2], q[3]);
+        targets.push(new THREE.Vector3(q[0], q[1], q[2]));
+    }
+    var spots = [[-2, 1, 50, 0], [5, 1, 60, 0]];
+    for (var i = 0; i < spots.length; i++) {
+        var s = spots[i];
+        var tc = this.world.spawnProbeTrafficCar(s[0], s[1], s[2], s[3]);
+        if (tc) { tc.setSpeed(6); targets.push(tc.position.clone()); }
+    }
+    var peds = [[-22, 1, 34], [24, 1, 28], [-20, 1, 42], [26, 1, 38]];
+    for (var i = 0; i < peds.length; i++) {
+        var q = peds[i];
+        this.world.spawnProbePedestrian(q[0], q[1], q[2], 0);
     }
 
-    this._placeNeonBuildings(rng, 16, 0, 45, 20);
+    this._placeNeonBuildings(rng, 10, -30, 34, 10);
+    this._placeNeonBuildings(rng, 10, 30, 34, 10);
+    this._placeNeonBuildings(rng, 12, 0, 60, 14);
+
+    this._probeFxTargets = targets;
 
     this.cam.inVehicle = false;
+    this.cam.distance = 8;
+    this.cam.height = 4.2;
+    this.cam.verticalAngle = -0.5;
     this.cam.update(0, this.player.mesh.position, this.player.mesh.quaternion, null, this.world.collisionBounds);
     this.camera.position.copy(this.cam.position);
     this.camera.lookAt(this.cam.lookAtTarget);
 
     this.missionManager.showMissionText('Storefront canyon', true);
+};
+
+Game.prototype._probeFx = function (dt) {
+    if (!this.probe) return;
+    this._fxFrame = (this._fxFrame || 0) + 1;
+    var p = this.player.mesh.position;
+    var origin = new THREE.Vector3(p.x, p.y + 1.5, p.z);
+    var targets = this._probeFxTargets;
+    var dir = new THREE.Vector3(0, 0, 1);
+    if (targets && targets.length) {
+        var t = targets[0];
+        dir.subVectors(t, origin).normalize();
+    }
+    this.effects.spawnTracer(origin.x, origin.y, origin.z, dir, 44, 0xff3333);
+    if (this._fxFrame % 4 === 0) {
+        this.effects.spawnMuzzleFlash(origin.x, origin.y, origin.z);
+    }
+    if (targets && targets.length && this._fxFrame % 10 === 0) {
+        var ti = targets[((this._fxFrame / 10) | 0) % targets.length];
+        var tx = ti.x + (Math.random() - 0.5) * 4;
+        var ty = ti.y + 0.5 + Math.random() * 2;
+        var tz = ti.z + (Math.random() - 0.5) * 4;
+        this.effects.spawnImpact(tx, ty, tz, 0xffaa00, 0);
+    }
 };
 
 // ---------------- Live world population ----------------
@@ -510,6 +583,7 @@ Game.prototype.update = function (dt) {
         this.camera.position.copy(this.cam.position);
         this.camera.lookAt(this.cam.lookAtTarget);
         this.effects.update(dt);
+        this._probeFx(dt);
         this.hud.update(dt);
         this.minimap.update(dt);
         this.renderer.render(this.scene, this.camera);
