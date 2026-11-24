@@ -90,19 +90,20 @@ World.prototype.update = function (dt) {
     }
 };
 
+World.prototype._syncMeshTransform = function (entity) {
+    entity.mesh.position.copy(entity.position);
+    entity.mesh.quaternion.copy(entity.quaternion);
+};
+
 World.prototype.addVehicle = function (vehicle) {
     this.vehicles.push(vehicle);
-    // Sync the transform at spawn so probe captures and the first rendered
-    // frame show the mesh where it was placed, not at the origin.
-    vehicle.mesh.position.copy(vehicle.position);
-    vehicle.mesh.quaternion.copy(vehicle.quaternion);
+    this._syncMeshTransform(vehicle);
     this.game.scene.add(vehicle.mesh);
 };
 
 World.prototype.addPedestrian = function (ped) {
     this.pedestrians.push(ped);
-    ped.mesh.position.copy(ped.position);
-    ped.mesh.quaternion.copy(ped.quaternion);
+    this._syncMeshTransform(ped);
     this.game.scene.add(ped.mesh);
 };
 

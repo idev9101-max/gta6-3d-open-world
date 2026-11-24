@@ -219,16 +219,7 @@ Game.prototype.setWanted = function (level) {
 
 // ---------------- Probe mode ----------------
 
-Game.prototype._buildProbeScene = function () {
-    var rng = new MathUtils.SeededRNG(this.probe.seed);
-    this.world.probeMode = true;
-    // ensure stubs exist
-    this.world.collisionBounds = this.world.collisionBounds || [];
-    this.world.roadNetwork = this.world.roadNetwork || { segments: [], intersections: [] };
-    this.world.vehicles = this.world.vehicles || [];
-    this.world.pedestrians = this.world.pedestrians || [];
-    this.world.timeOfDay = this.timeOfDay;
-
+Game.prototype._initProbeScene = function () {
     // Showcase lighting: probe captures freeze a posed scene, so light it like
     // a lit street at dusk instead of the ambient midnight defaults.
     if (this.lighting) {
@@ -249,6 +240,23 @@ Game.prototype._buildProbeScene = function () {
     if (this.world.group) this.world.group.visible = false;
     if (this.world.instMesh) this.world.instMesh.visible = false;
     this.world.collisionBounds.length = 0;
+
+    // Default player pose for the staged shot.
+    this.player.spawn(0, 1, 16, 0);
+    this.player.setOnFoot(true);
+};
+
+Game.prototype._buildProbeScene = function () {
+    var rng = new MathUtils.SeededRNG(this.probe.seed);
+    this.world.probeMode = true;
+    // ensure stubs exist
+    this.world.collisionBounds = this.world.collisionBounds || [];
+    this.world.roadNetwork = this.world.roadNetwork || { segments: [], intersections: [] };
+    this.world.vehicles = this.world.vehicles || [];
+    this.world.pedestrians = this.world.pedestrians || [];
+    this.world.timeOfDay = this.timeOfDay;
+
+    this._initProbeScene();
 
     var n = this.probe.n;
     if (n === 1) this._probe1(rng);
@@ -296,7 +304,6 @@ Game.prototype._probe1 = function (rng) {
     // Cover shot: player on foot at an intersection, 5-star wanted, police converging from ahead.
     this.setWanted(5);
     this.player.spawn(0, 1, 20, 0);
-    this.player.setOnFoot(true);
 
     var cars = [];
     var c1 = this.world.spawnProbePoliceCar(-11, 1, 30, Math.PI);
@@ -365,8 +372,6 @@ Game.prototype._probe2 = function (rng) {
 
 Game.prototype._probe3 = function (rng) {
     // Plaza combat: pedestrians at varied distances ahead, impacts and muzzle flash.
-    this.player.spawn(0, 1, 16, 0);
-    this.player.setOnFoot(true);
     this.setWanted(2);
 
     var peds = [[-6, 1, 24], [4, 1, 30], [-3, 1, 38], [6, 1, 27], [-7, 1, 44], [2, 1, 50]];
@@ -394,8 +399,6 @@ Game.prototype._probe3 = function (rng) {
 
 Game.prototype._probe4 = function (rng) {
     // Street canyon vista: parked curb cars, traffic, pedestrians, dense tall buildings.
-    this.player.spawn(0, 1, 16, 0);
-    this.player.setOnFoot(true);
     this.setWanted(1);
 
     var parked = [[-7.5, 1, 28, 0], [-7.5, 1, 38, 0], [7.5, 1, 30, 0], [7.5, 1, 42, 0]];

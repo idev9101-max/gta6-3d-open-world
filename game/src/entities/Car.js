@@ -1,5 +1,7 @@
 // SOLMAR NIGHTS - base car entity with arcade driving physics.
 
+var NEON_STRIP_HEIGHT = 1.28;
+
 var Car = function (game) {
     this.game = game;
     this.mesh = null;
@@ -67,7 +69,7 @@ Car.prototype.init = function (x, y, z, rot) {
         new THREE.BoxGeometry(2.05, 0.18, 4.4),
         new THREE.MeshBasicMaterial({ color: 0x00ff88 })
     );
-    strip.position.set(0, 1.28, 0);
+    strip.position.set(0, NEON_STRIP_HEIGHT, 0);
     group.add(strip);
 
     group.position.copy(this.position);
