@@ -35,6 +35,7 @@ World.prototype.init = function () {
     this.buildingInstancer = new BuildingInstancer();
     var instMesh = this.buildingInstancer.build(this.buildings.length * 3); // room for parts
     scene.add(instMesh);
+    this.instMesh = instMesh;
     var self = this;
     this.buildings.forEach(function (b) {
         var mesh = b.makeMesh();
@@ -91,11 +92,17 @@ World.prototype.update = function (dt) {
 
 World.prototype.addVehicle = function (vehicle) {
     this.vehicles.push(vehicle);
+    // Sync the transform at spawn so probe captures and the first rendered
+    // frame show the mesh where it was placed, not at the origin.
+    vehicle.mesh.position.copy(vehicle.position);
+    vehicle.mesh.quaternion.copy(vehicle.quaternion);
     this.game.scene.add(vehicle.mesh);
 };
 
 World.prototype.addPedestrian = function (ped) {
     this.pedestrians.push(ped);
+    ped.mesh.position.copy(ped.position);
+    ped.mesh.quaternion.copy(ped.quaternion);
     this.game.scene.add(ped.mesh);
 };
 

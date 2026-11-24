@@ -229,6 +229,27 @@ Game.prototype._buildProbeScene = function () {
     this.world.pedestrians = this.world.pedestrians || [];
     this.world.timeOfDay = this.timeOfDay;
 
+    // Showcase lighting: probe captures freeze a posed scene, so light it like
+    // a lit street at dusk instead of the ambient midnight defaults.
+    if (this.lighting) {
+        this.lighting.hemi.color.setHex(0x445588);
+        this.lighting.hemi.groundColor.setHex(0x1a1420);
+        this.lighting.hemi.intensity = 1.15;
+        this.lighting.dir.color.setHex(0xffcc99);
+        this.lighting.dir.intensity = 1.5;
+    }
+    // A soft ambient lift keeps the asphalt and unlit surfaces readable in the
+    // frozen frame instead of crushing them to black.
+    var ambient = new THREE.AmbientLight(0x2a3550, 0.85);
+    this.scene.add(ambient);
+
+    // Hide the generated city: probe scenes stage their own skyline so the
+    // framed corridor stays clear of random buildings. Its collision boxes
+    // are cleared too so the camera boom is not blocked by invisible walls.
+    if (this.world.group) this.world.group.visible = false;
+    if (this.world.instMesh) this.world.instMesh.visible = false;
+    this.world.collisionBounds.length = 0;
+
     var n = this.probe.n;
     if (n === 1) this._probe1(rng);
     else if (n === 2) this._probe2(rng);
@@ -253,10 +274,28 @@ Game.prototype._placeNeonBuildings = function (rng, count, cx, cz, spread) {
     }
 };
 
+// Backdrop skyline for probe captures: a far wall of buildings behind the
+// staged action plus flanking rows left and right of a clear street corridor,
+// so buildings frame the shot instead of swallowing the staged entities.
+Game.prototype._placeBackdrop = function (rng, farZ, sideZMax, countFar, countSide) {
+    var i, bx, bz;
+    for (i = 0; i < (countFar || 14); i++) {
+        bx = rng.range(-38, 38);
+        bz = farZ + rng.range(0, 14);
+        this.world.addProbeBuilding(bx, bz, rng.range(16, 36), MathUtils.randomNeonColor(rng));
+    }
+    for (i = 0; i < (countSide || 10); i++) {
+        var side = i % 2 === 0 ? -1 : 1;
+        bx = side * rng.range(24, 44);
+        bz = rng.range(10, sideZMax);
+        this.world.addProbeBuilding(bx, bz, rng.range(12, 30), MathUtils.randomNeonColor(rng));
+    }
+};
+
 Game.prototype._probe1 = function (rng) {
     // Cover shot: player on foot at an intersection, 5-star wanted, police converging from ahead.
     this.setWanted(5);
-    this.player.spawn(0, 1, 0, 0);
+    this.player.spawn(0, 1, 20, 0);
     this.player.setOnFoot(true);
 
     var cars = [];
@@ -274,8 +313,6 @@ Game.prototype._probe1 = function (rng) {
         this.world.spawnProbePedestrian(q[0], q[1], q[2], 0);
     }
 
-    this._placeNeonBuildings(rng, 24, 0, 42, 32);
-
     this._probeFxTargets = cars;
 
     this.cam.inVehicle = false;
@@ -285,6 +322,8 @@ Game.prototype._probe1 = function (rng) {
     this.cam.update(0, this.player.mesh.position, this.player.mesh.quaternion, null, this.world.collisionBounds);
     this.camera.position.copy(this.cam.position);
     this.camera.lookAt(this.cam.lookAtTarget);
+
+    this._placeBackdrop(rng, 62, 46, 16, 12);
 
     this.missionManager.showMissionText('Evade the police', true);
 };
@@ -309,9 +348,7 @@ Game.prototype._probe2 = function (rng) {
     var police = this.world.spawnProbePoliceCar(10, 1, 22, 0);
     if (police) police.setSpeed(0);
 
-    this._placeNeonBuildings(rng, 10, -24, 36, 10);
-    this._placeNeonBuildings(rng, 10, 24, 36, 10);
-    this._placeNeonBuildings(rng, 8, 0, 62, 16);
+    this._placeBackdrop(rng, 76, 62, 14, 12);
 
     this._probeFxTargets = traffic;
 
@@ -328,11 +365,11 @@ Game.prototype._probe2 = function (rng) {
 
 Game.prototype._probe3 = function (rng) {
     // Plaza combat: pedestrians at varied distances ahead, impacts and muzzle flash.
-    this.player.spawn(0, 1, 0, 0);
+    this.player.spawn(0, 1, 16, 0);
     this.player.setOnFoot(true);
     this.setWanted(2);
 
-    var peds = [[-8, 1, 15], [4, 1, 26], [-3, 1, 36], [11, 1, 22], [-12, 1, 40], [2, 1, 48]];
+    var peds = [[-6, 1, 24], [4, 1, 30], [-3, 1, 38], [6, 1, 27], [-7, 1, 44], [2, 1, 50]];
     var targets = [];
     for (var i = 0; i < peds.length; i++) {
         var q = peds[i];
@@ -340,7 +377,7 @@ Game.prototype._probe3 = function (rng) {
         targets.push(new THREE.Vector3(q[0], q[1], q[2]));
     }
 
-    this._placeNeonBuildings(rng, 16, 0, 48, 18);
+    this._placeBackdrop(rng, 66, 54, 16, 12);
 
     this._probeFxTargets = targets;
 
@@ -357,32 +394,30 @@ Game.prototype._probe3 = function (rng) {
 
 Game.prototype._probe4 = function (rng) {
     // Street canyon vista: parked curb cars, traffic, pedestrians, dense tall buildings.
-    this.player.spawn(0, 1, 0, 0);
+    this.player.spawn(0, 1, 16, 0);
     this.player.setOnFoot(true);
     this.setWanted(1);
 
-    var parked = [[-18, 1, 30, 0], [-10, 1, 38, 0], [18, 1, 28, 0], [10, 1, 42, 0]];
+    var parked = [[-7.5, 1, 28, 0], [-7.5, 1, 38, 0], [7.5, 1, 30, 0], [7.5, 1, 42, 0]];
     var targets = [];
     for (var i = 0; i < parked.length; i++) {
         var q = parked[i];
         this.world.spawnProbeParkedCar(q[0], q[1], q[2], q[3]);
         targets.push(new THREE.Vector3(q[0], q[1], q[2]));
     }
-    var spots = [[-2, 1, 50, 0], [5, 1, 60, 0]];
+    var spots = [[-2, 1, 48, 0], [4, 1, 58, 0]];
     for (var i = 0; i < spots.length; i++) {
         var s = spots[i];
         var tc = this.world.spawnProbeTrafficCar(s[0], s[1], s[2], s[3]);
         if (tc) { tc.setSpeed(6); targets.push(tc.position.clone()); }
     }
-    var peds = [[-22, 1, 34], [24, 1, 28], [-20, 1, 42], [26, 1, 38]];
+    var peds = [[-9, 1, 33], [9, 1, 29], [-9, 1, 41], [9, 1, 37]];
     for (var i = 0; i < peds.length; i++) {
         var q = peds[i];
         this.world.spawnProbePedestrian(q[0], q[1], q[2], 0);
     }
 
-    this._placeNeonBuildings(rng, 10, -30, 34, 10);
-    this._placeNeonBuildings(rng, 10, 30, 34, 10);
-    this._placeNeonBuildings(rng, 12, 0, 60, 14);
+    this._placeBackdrop(rng, 78, 66, 14, 12);
 
     this._probeFxTargets = targets;
 
