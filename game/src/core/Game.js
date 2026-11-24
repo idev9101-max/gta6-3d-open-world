@@ -241,6 +241,15 @@ Game.prototype._initProbeScene = function () {
     if (this.world.instMesh) this.world.instMesh.visible = false;
     this.world.collisionBounds.length = 0;
 
+    // The live roads bake a neon-green vertex-color gradient that floods a
+    // staged night frame. For probe captures only, swap in flat dark asphalt.
+    if (this.world.roads && this.world.roads.mesh) {
+        this.world.roads.mesh.material = new THREE.MeshBasicMaterial({
+            color: 0x141a22,
+            side: THREE.DoubleSide
+        });
+    }
+
     // Default player pose for the staged shot.
     this.player.spawn(0, 1, 16, 0);
     this.player.setOnFoot(true);
